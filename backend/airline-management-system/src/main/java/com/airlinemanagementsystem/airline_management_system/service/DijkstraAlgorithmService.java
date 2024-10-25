@@ -1,17 +1,21 @@
 package com.airlinemanagementsystem.airline_management_system.service;
 
-
 import com.airlinemanagementsystem.airline_management_system.model.Airport;
 import com.airlinemanagementsystem.airline_management_system.model.FlightRoute;
 import com.airlinemanagementsystem.airline_management_system.repository.AirportRepository;
 import com.airlinemanagementsystem.airline_management_system.repository.FlightRouteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.function.Function;
 
 @Service
 public class DijkstraAlgorithmService {
+
+    private static final Logger logger = LoggerFactory.getLogger(DijkstraAlgorithmService.class);
 
     @Autowired
     private AirportRepository airportRepository;
@@ -19,13 +23,18 @@ public class DijkstraAlgorithmService {
     @Autowired
     private FlightRouteRepository flightRouteRepository;
 
-    private static class Node {
+    private static class Node implements Comparable<Node> {
         Airport airport;
         double weight;
 
         Node(Airport airport, double weight) {
             this.airport = airport;
             this.weight = weight;
+        }
+
+        @Override
+        public int compareTo(Node other) {
+            return Double.compare(this.weight, other.weight);
         }
     }
 
@@ -35,7 +44,9 @@ public class DijkstraAlgorithmService {
         Airport destination = airportRepository.findByCode(destinationCode)
                 .orElseThrow(() -> new RuntimeException("Destination airport not found"));
 
-        PriorityQueue<Node> queue = new PriorityQueue<>(Comparator.comparingDouble(node -> node.weight));
+        Function<FlightRoute, Double> weightFunction = getWeightFunction(criteria);
+
+        PriorityQueue<Node> queue = new PriorityQueue<>();
         queue.add(new Node(source, 0));
 
         Map<Airport, Double> distances = new HashMap<>();
@@ -59,21 +70,7 @@ public class DijkstraAlgorithmService {
                 Airport neighbor = route.getDestination();
                 if (visited.contains(neighbor)) continue;
 
-                double weight = 0;
-                switch (criteria.toLowerCase()) {
-                    case "cost":
-                        weight = route.getCost();
-                        break;
-                    case "distance":
-                        weight = route.getDistance();
-                        break;
-                    case "time":
-                        weight = route.getTime();
-                        break;
-                    default:
-                        throw new IllegalArgumentException("Invalid criteria: " + criteria);
-                }
-
+                double weight = weightFunction.apply(route);
                 double newDist = distances.get(currentAirport) + weight;
 
                 if (newDist < distances.getOrDefault(neighbor, Double.MAX_VALUE)) {
@@ -82,16 +79,59 @@ public class DijkstraAlgorithmService {
                     queue.add(new Node(neighbor, newDist));
                 }
             }
+
+            // Improved debug log with airport names
+            logger.info("Processed Airport: {}", currentAirport.getCode());
+            logger.info("Distances Map: {}", getReadableMap(distances));
+            logger.info("Predecessors Map: {}", getReadablePredecessorsMap(predecessors));
         }
 
+        // Reconstruct the path from destination to source using predecessors
         List<Airport> path = new ArrayList<>();
         for (Airport at = destination; at != null; at = predecessors.get(at)) {
             path.add(at);
+            logger.info("Path step added: {}", at.getCode());
         }
-        Collections.reverse(path);
+
+        Collections.reverse(path); // Reverse to get the correct order from source to destination
+
+        if (path.size() == 1 && !path.contains(source)) {
+            logger.warn("No path found from {} to {}", sourceCode, destinationCode);
+            return Collections.emptyList();
+        }
+
         return path;
     }
 
+    private Function<FlightRoute, Double> getWeightFunction(String criteria) {
+        switch (criteria.toLowerCase()) {
+            case "cost":
+                return FlightRoute::getCost;
+            case "distance":
+                return FlightRoute::getDistance;
+            case "time":
+                return FlightRoute::getTime;
+            default:
+                throw new IllegalArgumentException("Invalid criteria: " + criteria);
+        }
+    }
+
+    private String getReadableMap(Map<Airport, Double> map) {
+        StringBuilder result = new StringBuilder("{");
+        for (Map.Entry<Airport, Double> entry : map.entrySet()) {
+            result.append(entry.getKey().getCode()).append("=").append(entry.getValue()).append(", ");
+        }
+        return result.append("}").toString();
+    }
+
+    private String getReadablePredecessorsMap(Map<Airport, Airport> predecessors) {
+        StringBuilder result = new StringBuilder("{");
+        for (Map.Entry<Airport, Airport> entry : predecessors.entrySet()) {
+            result.append(entry.getKey().getCode())
+                    .append("->")
+                    .append(entry.getValue() != null ? entry.getValue().getCode() : "null")
+                    .append(", ");
+        }
+        return result.append("}").toString();
+    }
 }
-
-
