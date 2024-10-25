@@ -2,7 +2,6 @@ package com.airlinemanagementsystem.airline_management_system.controller;
 
 import com.airlinemanagementsystem.airline_management_system.model.Airport;
 import com.airlinemanagementsystem.airline_management_system.model.FlightRoute;
-import com.airlinemanagementsystem.airline_management_system.repository.AirportRepository;
 import com.airlinemanagementsystem.airline_management_system.repository.FlightRouteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +15,7 @@ import java.util.List;
 public class TestController {
 
     @Autowired
-    private AirportRepository airportRepository;
+    private irportRepository airportRepository;
 
     @Autowired
     private FlightRouteRepository flightRouteRepository;
