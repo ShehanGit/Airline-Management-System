@@ -40,9 +40,9 @@ public class DijkstraAlgorithmService {
 
     public List<Airport> findShortestPath(String sourceCode, String destinationCode, String criteria) {
         Airport source = airportRepository.findByCode(sourceCode)
-                .orElseThrow(() -> new RuntimeException("Source airport not found"));
+                .orElseThrow(() -> new RuntimeException("Source airport not found: " + sourceCode));
         Airport destination = airportRepository.findByCode(destinationCode)
-                .orElseThrow(() -> new RuntimeException("Destination airport not found"));
+                .orElseThrow(() -> new RuntimeException("Destination airport not found: " + destinationCode));
 
         Function<FlightRoute, Double> weightFunction = getWeightFunction(criteria);
 
@@ -80,23 +80,25 @@ public class DijkstraAlgorithmService {
                 }
             }
 
-            // Improved debug log with airport names
             logger.info("Processed Airport: {}", currentAirport.getCode());
-            logger.info("Distances Map: {}", getReadableMap(distances));
-            logger.info("Predecessors Map: {}", getReadablePredecessorsMap(predecessors));
+            logger.debug("Distances Map: {}", getReadableMap(distances));
+            logger.debug("Predecessors Map: {}", getReadablePredecessorsMap(predecessors));
         }
 
-        // Reconstruct the path from destination to source using predecessors
+        return buildPath(destination, predecessors, source);
+    }
+
+    private List<Airport> buildPath(Airport destination, Map<Airport, Airport> predecessors, Airport source) {
         List<Airport> path = new ArrayList<>();
         for (Airport at = destination; at != null; at = predecessors.get(at)) {
             path.add(at);
             logger.info("Path step added: {}", at.getCode());
         }
 
-        Collections.reverse(path); // Reverse to get the correct order from source to destination
+        Collections.reverse(path);
 
         if (path.size() == 1 && !path.contains(source)) {
-            logger.warn("No path found from {} to {}", sourceCode, destinationCode);
+            logger.warn("No path found from {} to {}", source.getCode(), destination.getCode());
             return Collections.emptyList();
         }
 
