@@ -25,25 +25,34 @@ public class FlightRoute {
     // Other fields...
 
     // Getters and setters
-    public Airport getSource() {
-        return source;
+    public Long getId() {
+        return id;
     }
 
-    public void setSource(Airport source) {
-        this.source = source;
+    public Airport getSource() {
+        return source;
     }
 
     public Airport getDestination() {
         return destination;
     }
 
-    public void setDestination(Airport destination) {
-        this.destination = destination;
-    }
-
     public double getDistance() {
         return distance;
     }
 
-    // Other getters and setters...
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FlightRoute that = (FlightRoute) o;
+
+        return id != null ? id.equals(that.id) : that.id == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
 }

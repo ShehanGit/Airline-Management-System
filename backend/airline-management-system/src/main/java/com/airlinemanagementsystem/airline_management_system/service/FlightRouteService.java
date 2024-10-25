@@ -1,11 +1,14 @@
 package com.airlinemanagementsystem.airline_management_system.service;
 
+import com.airlinemanagementsystem.airline_management_system.model.Airport;
 import com.airlinemanagementsystem.airline_management_system.model.FlightRoute;
+import com.airlinemanagementsystem.airline_management_system.repository.AirportRepository;
 import com.airlinemanagementsystem.airline_management_system.repository.FlightRouteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FlightRouteService {
@@ -14,31 +17,28 @@ public class FlightRouteService {
     private FlightRouteRepository flightRouteRepository;
 
     @Autowired
-    private DijkstraAlgorithm dijkstraAlgorithm;
+    private AirportRepository airportRepository;
 
     public List<Long> getShortestRoute(Long startId, Long endId) {
-        Map<Long, List<DijkstraAlgorithm.Edge>> graph = buildGraph();
-        return dijkstraAlgorithm.findShortestPath(startId, endId, graph);
-    }
+        // Fetch the source and destination airports
+        Airport source = airportRepository.findById(startId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid source airport id: " + startId));
+        Airport destination = airportRepository.findById(endId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid destination airport id: " + endId));
 
-    private Map<Long, List<DijkstraAlgorithm.Edge>> buildGraph() {
-        Map<Long, List<DijkstraAlgorithm.Edge>> graph = new HashMap<>();
+        // Fetch all airports and flight routes to build the graph
+        List<Airport> airports = airportRepository.findAll();
+        List<FlightRoute> flightRoutes = flightRouteRepository.findAll();
 
-        List<FlightRoute> routes = flightRouteRepository.findAll();
-        for (FlightRoute route : routes) {
-            Long sourceId = route.getSource().getId();
-            Long destId = route.getDestination().getId();
-            double distance = route.getDistance();
+        // Initialize Dijkstra's algorithm with the airports and flight routes
+        DijkstraAlgorithm dijkstraAlgorithm = new DijkstraAlgorithm(airports, flightRoutes);
 
-            // Add edge from source to destination
-            graph.computeIfAbsent(sourceId, k -> new ArrayList<>())
-                    .add(new DijkstraAlgorithm.Edge(destId, distance));
+        // Compute the shortest path
+        List<Airport> path = dijkstraAlgorithm.computeShortestPath(source, destination);
 
-            // If flights are bidirectional, add reverse edge
-            graph.computeIfAbsent(destId, k -> new ArrayList<>())
-                    .add(new DijkstraAlgorithm.Edge(sourceId, distance));
-        }
-
-        return graph;
+        // Convert the list of airports to a list of airport IDs
+        return path.stream()
+                .map(Airport::getId)
+                .collect(Collectors.toList());
     }
 }

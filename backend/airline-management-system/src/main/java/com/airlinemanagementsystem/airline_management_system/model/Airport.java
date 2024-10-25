@@ -25,17 +25,6 @@ public class Airport {
     // Constructors
     public Airport() {}
 
-    public Airport(String name, String code, String city, String country, double latitude, double longitude, String timezone, int runwayCapacity, boolean isInternational) {
-        this.name = name;
-        this.code = code;
-        this.city = city;
-        this.country = country;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.timezone = timezone;
-        this.runwayCapacity = runwayCapacity;
-        this.isInternational = isInternational;
-    }
 
     // Getters and Setters
     public Long getId() {
@@ -116,5 +105,21 @@ public class Airport {
 
     public void setInternational(boolean international) {
         isInternational = international;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Airport airport = (Airport) o;
+
+        return id != null ? id.equals(airport.id) : airport.id == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
     }
 }

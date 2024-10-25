@@ -1,94 +1,116 @@
 package com.airlinemanagementsystem.airline_management_system.service;
 
-import org.springframework.stereotype.Service;
+import com.airlinemanagementsystem.airline_management_system.model.Airport;
+import com.airlinemanagementsystem.airline_management_system.model.FlightRoute;
 
 import java.util.*;
 
-@Service
 public class DijkstraAlgorithm {
 
-    private Map<Long, Double> distances;
-    private Map<Long, Long> previousNodes;
-    private PriorityQueue<Node> pq;
-    private Set<Long> settled;
+    private final Map<Long, Airport> airportsById;
+    private final Map<Long, List<Edge>> adjacencyList;
 
-    public List<Long> findShortestPath(Long startId, Long endId, Map<Long, List<Edge>> graph) {
-        distances = new HashMap<>();
-        previousNodes = new HashMap<>();
-        pq = new PriorityQueue<>(Comparator.comparingDouble(Node::getCost));
-        settled = new HashSet<>();
+    public DijkstraAlgorithm(List<Airport> airports, List<FlightRoute> flightRoutes) {
+        airportsById = new HashMap<>();
+        for (Airport airport : airports) {
+            airportsById.put(airport.getId(), airport);
+        }
+        adjacencyList = new HashMap<>();
+        buildGraph(flightRoutes);
+    }
 
-        distances.put(startId, 0.0);
-        pq.add(new Node(startId, 0.0));
+    private void buildGraph(List<FlightRoute> flightRoutes) {
+        for (FlightRoute route : flightRoutes) {
+            Long sourceId = route.getSource().getId();
+            Long destId = route.getDestination().getId();
+            double distance = route.getDistance();
 
-        while (!pq.isEmpty()) {
-            Node currentNode = pq.poll();
-            Long currentId = currentNode.getId();
+            // Initialize adjacency list entries if not present
+            adjacencyList.computeIfAbsent(sourceId, k -> new ArrayList<>());
 
-            if (settled.contains(currentId)) continue;
-            settled.add(currentId);
+            // Add edge from source to destination
+            adjacencyList.get(sourceId).add(new Edge(destId, distance));
 
-            if (currentId.equals(endId)) break;
+            // Uncomment the following lines if flight routes are bidirectional
+            // adjacencyList.computeIfAbsent(destId, k -> new ArrayList<>());
+            // adjacencyList.get(destId).add(new Edge(sourceId, distance));
+        }
+    }
 
-            List<Edge> neighbors = graph.getOrDefault(currentId, new ArrayList<>());
+    public List<Airport> computeShortestPath(Airport source, Airport destination) {
+        Map<Long, Double> distances = new HashMap<>();
+        Map<Long, Long> previous = new HashMap<>();
+        PriorityQueue<Node> queue = new PriorityQueue<>(Comparator.comparingDouble(n -> n.distance));
+
+        // Initialize distances to infinity, except for the source
+        for (Long airportId : airportsById.keySet()) {
+            distances.put(airportId, Double.MAX_VALUE);
+        }
+        distances.put(source.getId(), 0.0);
+
+        queue.add(new Node(source.getId(), 0.0));
+
+        while (!queue.isEmpty()) {
+            Node currentNode = queue.poll();
+            Long currentAirportId = currentNode.airportId;
+
+            if (currentAirportId.equals(destination.getId())) {
+                break; // Reached the destination
+            }
+
+            List<Edge> neighbors = adjacencyList.getOrDefault(currentAirportId, Collections.emptyList());
+
             for (Edge edge : neighbors) {
-                Long neighborId = edge.getDestinationId();
-                double newDist = distances.get(currentId) + edge.getCost();
-
-                if (!distances.containsKey(neighborId) || newDist < distances.get(neighborId)) {
+                Long neighborId = edge.destinationId;
+                double newDist = distances.get(currentAirportId) + edge.distance;
+                if (newDist < distances.get(neighborId)) {
                     distances.put(neighborId, newDist);
-                    previousNodes.put(neighborId, currentId);
-                    pq.add(new Node(neighborId, newDist));
+                    previous.put(neighborId, currentAirportId);
+                    queue.add(new Node(neighborId, newDist));
                 }
             }
         }
 
-        return reconstructPath(startId, endId);
+        // Reconstruct the shortest path
+        LinkedList<Airport> path = new LinkedList<>();
+        Long currentId = destination.getId();
+
+        if (!distances.containsKey(currentId) || distances.get(currentId) == Double.MAX_VALUE) {
+            // No path found
+            return path;
+        }
+
+        while (currentId != null && !currentId.equals(source.getId())) {
+            Airport airport = airportsById.get(currentId);
+            path.addFirst(airport);
+            currentId = previous.get(currentId);
+        }
+
+        // Add the source airport at the beginning
+        if (currentId != null) {
+            path.addFirst(airportsById.get(currentId));
+        }
+
+        return path;
     }
 
-    private List<Long> reconstructPath(Long startId, Long endId) {
-        List<Long> path = new ArrayList<>();
-        for (Long at = endId; at != null; at = previousNodes.get(at)) {
-            path.add(at);
-        }
-        Collections.reverse(path);
+    private static class Edge {
+        Long destinationId;
+        double distance;
 
-        return path.get(0).equals(startId) ? path : new ArrayList<>();
+        public Edge(Long destinationId, double distance) {
+            this.destinationId = destinationId;
+            this.distance = distance;
+        }
     }
 
     private static class Node {
-        private Long id;
-        private Double cost;
+        Long airportId;
+        double distance;
 
-        public Node(Long id, Double cost) {
-            this.id = id;
-            this.cost = cost;
-        }
-
-        public Long getId() {
-            return id;
-        }
-
-        public Double getCost() {
-            return cost;
-        }
-    }
-
-    public static class Edge {
-        private Long destinationId;
-        private double cost;
-
-        public Edge(Long destinationId, double cost) {
-            this.destinationId = destinationId;
-            this.cost = cost;
-        }
-
-        public Long getDestinationId() {
-            return destinationId;
-        }
-
-        public double getCost() {
-            return cost;
+        public Node(Long airportId, double distance) {
+            this.airportId = airportId;
+            this.distance = distance;
         }
     }
 }
