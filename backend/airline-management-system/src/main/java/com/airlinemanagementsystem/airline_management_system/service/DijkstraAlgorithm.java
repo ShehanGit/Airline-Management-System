@@ -113,4 +113,5 @@ public class DijkstraAlgorithm {
             this.distance = distance;
         }
     }
+
 }
