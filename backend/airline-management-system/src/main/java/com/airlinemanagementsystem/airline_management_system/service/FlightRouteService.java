@@ -2,6 +2,7 @@ package com.airlinemanagementsystem.airline_management_system.service;
 
 import com.airlinemanagementsystem.airline_management_system.model.Airport;
 import com.airlinemanagementsystem.airline_management_system.model.FlightRoute;
+import com.airlinemanagementsystem.airline_management_system.model.WeightType;
 import com.airlinemanagementsystem.airline_management_system.repository.AirportRepository;
 import com.airlinemanagementsystem.airline_management_system.repository.FlightRouteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class FlightRouteService {
     @Autowired
     private AirportRepository airportRepository;
 
-    public List<Long> getShortestRoute(Long startId, Long endId) {
+    public List<Long> getShortestRoute(Long startId, Long endId, WeightType weightType) {
         // Fetch the source and destination airports
         Airport source = airportRepository.findById(startId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid source airport id: " + startId));
@@ -34,7 +35,7 @@ public class FlightRouteService {
         DijkstraAlgorithm dijkstraAlgorithm = new DijkstraAlgorithm(airports, flightRoutes);
 
         // Compute the shortest path
-        List<Airport> path = dijkstraAlgorithm.computeShortestPath(source, destination);
+        List<Airport> path = dijkstraAlgorithm.computeShortestPath(source, destination, weightType);
 
         // Convert the list of airports to a list of airport IDs
         return path.stream()

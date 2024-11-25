@@ -2,6 +2,7 @@ package com.airlinemanagementsystem.airline_management_system.service;
 
 import com.airlinemanagementsystem.airline_management_system.model.Airport;
 import com.airlinemanagementsystem.airline_management_system.model.FlightRoute;
+import com.airlinemanagementsystem.airline_management_system.model.WeightType;
 
 import java.util.*;
 
@@ -24,20 +25,20 @@ public class DijkstraAlgorithm {
             Long sourceId = route.getSource().getId();
             Long destId = route.getDestination().getId();
             double distance = route.getDistance();
+            double cost = route.getCost();
+            double time = route.getTime();
 
             // Initialize adjacency list entries if not present
             adjacencyList.computeIfAbsent(sourceId, k -> new ArrayList<>());
 
             // Add edge from source to destination
-            adjacencyList.get(sourceId).add(new Edge(destId, distance));
+            adjacencyList.get(sourceId).add(new Edge(destId, distance, cost, time));
 
-            // Uncomment the following lines if flight routes are bidirectional
-            // adjacencyList.computeIfAbsent(destId, k -> new ArrayList<>());
-            // adjacencyList.get(destId).add(new Edge(sourceId, distance));
+            // Since routes are unidirectional, do not add the reverse edge
         }
     }
 
-    public List<Airport> computeShortestPath(Airport source, Airport destination) {
+    public List<Airport> computeShortestPath(Airport source, Airport destination, WeightType weightType) {
         Map<Long, Double> distances = new HashMap<>();
         Map<Long, Long> previous = new HashMap<>();
         PriorityQueue<Node> queue = new PriorityQueue<>(Comparator.comparingDouble(n -> n.distance));
@@ -62,7 +63,23 @@ public class DijkstraAlgorithm {
 
             for (Edge edge : neighbors) {
                 Long neighborId = edge.destinationId;
-                double newDist = distances.get(currentAirportId) + edge.distance;
+
+                double edgeWeight;
+                switch (weightType) {
+                    case DISTANCE:
+                        edgeWeight = edge.distance;
+                        break;
+                    case COST:
+                        edgeWeight = edge.cost;
+                        break;
+                    case TIME:
+                        edgeWeight = edge.time;
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Invalid weight type");
+                }
+
+                double newDist = distances.get(currentAirportId) + edgeWeight;
                 if (newDist < distances.get(neighborId)) {
                     distances.put(neighborId, newDist);
                     previous.put(neighborId, currentAirportId);
@@ -97,10 +114,14 @@ public class DijkstraAlgorithm {
     private static class Edge {
         Long destinationId;
         double distance;
+        double cost;
+        double time;
 
-        public Edge(Long destinationId, double distance) {
+        public Edge(Long destinationId, double distance, double cost, double time) {
             this.destinationId = destinationId;
             this.distance = distance;
+            this.cost = cost;
+            this.time = time;
         }
     }
 
@@ -113,5 +134,4 @@ public class DijkstraAlgorithm {
             this.distance = distance;
         }
     }
-
 }

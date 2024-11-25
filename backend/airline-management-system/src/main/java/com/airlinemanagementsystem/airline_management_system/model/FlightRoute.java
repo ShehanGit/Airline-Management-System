@@ -1,6 +1,5 @@
 package com.airlinemanagementsystem.airline_management_system.model;
 
-
 import jakarta.persistence.*;
 
 @Entity
@@ -22,9 +21,7 @@ public class FlightRoute {
     private double distance;
     private double time;
 
-    // Other fields...
-
-    // Getters and setters
+    // Getters
     public Long getId() {
         return id;
     }
@@ -37,9 +34,19 @@ public class FlightRoute {
         return destination;
     }
 
+    public double getCost() {
+        return cost;
+    }
+
     public double getDistance() {
         return distance;
     }
+
+    public double getTime() {
+        return time;
+    }
+
+    // Other methods...
 
     @Override
     public boolean equals(Object o) {
