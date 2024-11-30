@@ -34,6 +34,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/airports").hasAnyAuthority("ADMIN")
                         .requestMatchers("/api/users").hasAnyAuthority("ADMIN")
                         .requestMatchers("/api/bookings").hasAnyAuthority("ADMIN")
+                        .requestMatchers("/api/staff").hasAnyAuthority("ADMIN")
 
                         .anyRequest().authenticated()
                 )
