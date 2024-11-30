@@ -3,8 +3,7 @@ package com.airlinemanagementsystem.airline_management_system.service;
 import com.airlinemanagementsystem.airline_management_system.user.User;
 import com.airlinemanagementsystem.airline_management_system.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -13,18 +12,18 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;  // Using PasswordEncoder interface
 
     @Autowired
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
+        this.passwordEncoder = passwordEncoder;  // Spring will inject BCryptPasswordEncoder automatically
     }
 
     // Create a new user
     public User createUser(User user) {
         // Hash the password before saving
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));  // BCryptPasswordEncoder automatically used
         return userRepository.save(user);
     }
 

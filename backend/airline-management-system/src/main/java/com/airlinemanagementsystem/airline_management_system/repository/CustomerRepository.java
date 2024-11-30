@@ -6,9 +6,5 @@ import java.util.Optional;
 
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
-    // Find customer by user ID (foreign key relationship)
-    Optional<Customer> findByUserId(Long userId);
-
-    // Find customer by passport number
     Optional<Customer> findByPassportNumber(String passportNumber);
 }

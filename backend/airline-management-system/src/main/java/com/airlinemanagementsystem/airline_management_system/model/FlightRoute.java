@@ -3,8 +3,8 @@ package com.airlinemanagementsystem.airline_management_system.model;
 import jakarta.persistence.*;
 
 import java.util.Date;
-
 @Entity
+@Table(name = "flight_route")
 public class FlightRoute {
 
     @Id

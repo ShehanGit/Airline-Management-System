@@ -18,41 +18,28 @@ public class CustomerService {
         this.customerRepository = customerRepository;
     }
 
-    // Create a new customer
-    public Customer createCustomer(Customer customer) {
+    // Create or Update a Customer
+    public Customer saveCustomer(Customer customer) {
         return customerRepository.save(customer);
     }
 
-    // Get all customers
+    // Get all Customers
     public List<Customer> getAllCustomers() {
         return customerRepository.findAll();
     }
 
-    // Get customer by ID
+    // Get Customer by ID
     public Optional<Customer> getCustomerById(Long customerId) {
         return customerRepository.findById(customerId);
     }
 
-    // Update customer details
-    public Optional<Customer> updateCustomer(Long customerId, Customer customer) {
-        if (customerRepository.existsById(customerId)) {
-            customer.setCustomerId(customerId);
-            return Optional.of(customerRepository.save(customer));
-        }
-        return Optional.empty();
+    // Delete Customer by ID
+    public void deleteCustomer(Long customerId) {
+        customerRepository.deleteById(customerId);
     }
 
-    // Delete customer
-    public boolean deleteCustomer(Long customerId) {
-        if (customerRepository.existsById(customerId)) {
-            customerRepository.deleteById(customerId);
-            return true;
-        }
-        return false;
-    }
-
-    // Get customer by passport number
-    public Optional<Customer> getCustomerByPassport(String passportNumber) {
+    // Find customer by passport number
+    public Optional<Customer> getCustomerByPassportNumber(String passportNumber) {
         return customerRepository.findByPassportNumber(passportNumber);
     }
 }
