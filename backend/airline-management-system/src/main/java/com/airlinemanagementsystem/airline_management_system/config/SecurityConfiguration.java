@@ -29,6 +29,10 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/v1/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/v1/manager/**").hasAuthority("MANAGER")
                         .requestMatchers("/api/v1/user/**").hasAuthority("USER")
+
+                        .requestMatchers("/api/aircrafts").hasAnyAuthority("ADMIN")
+                        .requestMatchers("/api/airports").hasAnyAuthority("ADMIN")
+
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
