@@ -38,8 +38,5 @@ public class CustomerService {
         customerRepository.deleteById(customerId);
     }
 
-    // Find customer by passport number
-    public Optional<Customer> getCustomerByPassportNumber(String passportNumber) {
-        return customerRepository.findByPassportNumber(passportNumber);
-    }
+
 }
