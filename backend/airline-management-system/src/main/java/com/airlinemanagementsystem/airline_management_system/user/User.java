@@ -1,5 +1,6 @@
 package com.airlinemanagementsystem.airline_management_system.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

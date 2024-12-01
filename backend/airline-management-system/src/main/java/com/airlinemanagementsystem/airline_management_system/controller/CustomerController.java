@@ -3,6 +3,8 @@ package com.airlinemanagementsystem.airline_management_system.controller;
 import com.airlinemanagementsystem.airline_management_system.model.Customer;
 import com.airlinemanagementsystem.airline_management_system.repository.CustomerRepository;
 import com.airlinemanagementsystem.airline_management_system.exception.ResourceNotFoundException;
+import com.airlinemanagementsystem.airline_management_system.user.User;
+import com.airlinemanagementsystem.airline_management_system.user.UserRepository; // Import UserRepository
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,9 @@ public class CustomerController {
 
     @Autowired
     private CustomerRepository customerRepository;
+
+    @Autowired
+    private UserRepository userRepository; // Inject the UserRepository here
 
     // Get all customers
     @GetMapping
@@ -36,6 +41,16 @@ public class CustomerController {
     // Create a new customer
     @PostMapping
     public Customer createCustomer(@RequestBody Customer customer) {
+        // Fetch the User by ID
+        User user = userRepository.findById(customer.getUser().getId()) // Use userRepository instance
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + customer.getUser().getId()));
+
+        // Optionally, check if the user's role is null and handle it accordingly
+        if (user.getRole() == null) {
+            throw new IllegalArgumentException("User's role must be set before creating a customer.");
+        }
+
+        customer.setUser(user);  // Set the existing user to the customer
         return customerRepository.save(customer);
     }
 
