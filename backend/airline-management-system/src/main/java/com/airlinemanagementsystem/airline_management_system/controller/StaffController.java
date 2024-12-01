@@ -8,58 +8,52 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/staff")
 public class StaffController {
 
-    @Autowired
-    private StaffService staffService;
+    private final StaffService staffService;
 
-    // Get all staff members
+    @Autowired
+    public StaffController(StaffService staffService) {
+        this.staffService = staffService;
+    }
+
+    // Create or Update Staff
+    @PostMapping
+    public ResponseEntity<Staff> createOrUpdateStaff(@RequestBody Staff staff) {
+        try {
+            Staff savedStaff = staffService.saveStaff(staff);
+            return new ResponseEntity<>(savedStaff, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);  // 400 Bad Request if user not found
+        }
+    }
+
+    // Get all Staff members
     @GetMapping
     public ResponseEntity<List<Staff>> getAllStaff() {
         List<Staff> staffList = staffService.getAllStaff();
-        return ResponseEntity.ok(staffList);
+        return new ResponseEntity<>(staffList, HttpStatus.OK);
     }
 
-    // Get staff by ID
-    @GetMapping("/{id}")
-    public ResponseEntity<Staff> getStaffById(@PathVariable Long id) {
-        Staff staff = staffService.getStaffById(id);
-        if (staff != null) {
-            return ResponseEntity.ok(staff);
+    // Get Staff by ID
+    @GetMapping("/{staffId}")
+    public ResponseEntity<Staff> getStaffById(@PathVariable Long staffId) {
+        Optional<Staff> staff = staffService.getStaffById(staffId);
+        if (staff.isPresent()) {
+            return new ResponseEntity<>(staff.get(), HttpStatus.OK);
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-    // Create a new staff member
-    @PostMapping
-    public ResponseEntity<Staff> createStaff(@RequestBody Staff staff) {
-        Staff newStaff = staffService.createStaff(staff);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newStaff);
-    }
-
-    // Update existing staff details
-    @PutMapping("/{id}")
-    public ResponseEntity<Staff> updateStaff(@PathVariable Long id, @RequestBody Staff staff) {
-        Staff updatedStaff = staffService.updateStaff(id, staff);
-        if (updatedStaff != null) {
-            return ResponseEntity.ok(updatedStaff);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-    }
-
-    // Delete staff member by ID
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteStaff(@PathVariable Long id) {
-        boolean isDeleted = staffService.deleteStaff(id);
-        if (isDeleted) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+    // Delete Staff by ID
+    @DeleteMapping("/{staffId}")
+    public ResponseEntity<Void> deleteStaff(@PathVariable Long staffId) {
+        staffService.deleteStaff(staffId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

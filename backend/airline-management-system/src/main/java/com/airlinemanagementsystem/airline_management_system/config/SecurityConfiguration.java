@@ -25,18 +25,21 @@ public class SecurityConfiguration {
         http
                 .csrf(AbstractHttpConfigurer::disable) // Disable CSRF as we're using JWT
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/api/v1/admin/**").hasAuthority("ADMIN")
-                        .requestMatchers("/api/v1/manager/**").hasAuthority("MANAGER")
-                        .requestMatchers("/api/v1/user/**").hasAuthority("USER")
 
-                        .requestMatchers("/api/aircrafts").hasAnyAuthority("ADMIN")
-                        .requestMatchers("/api/airports").hasAnyAuthority("ADMIN")
-                        .requestMatchers("/api/users").hasAnyAuthority("ADMIN")
-                        .requestMatchers("/api/bookings").hasAnyAuthority("ADMIN")
-                        .requestMatchers("/api/staff").hasAnyAuthority("ADMIN")
+                                .anyRequest().permitAll()  // Permit all requests for dev
 
-                        .anyRequest().authenticated()
+//                        .requestMatchers("/api/v1/auth/**").permitAll()
+//                        .requestMatchers("/api/v1/admin/**").hasAuthority("ADMIN")
+//                        .requestMatchers("/api/v1/manager/**").hasAuthority("MANAGER")
+//                        .requestMatchers("/api/v1/user/**").hasAuthority("USER")
+//
+//                        .requestMatchers("/api/aircrafts").hasAnyAuthority("ADMIN")
+//                        .requestMatchers("/api/airports").hasAnyAuthority("ADMIN")
+//                        .requestMatchers("/api/users").hasAnyAuthority("ADMIN")
+//                        .requestMatchers("/api/bookings").hasAnyAuthority("ADMIN")
+//                        .requestMatchers("/api/staff").hasAnyAuthority("ADMIN")
+//
+//                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

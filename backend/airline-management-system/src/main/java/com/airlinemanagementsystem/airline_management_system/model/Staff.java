@@ -1,6 +1,7 @@
 package com.airlinemanagementsystem.airline_management_system.model;
 
 import com.airlinemanagementsystem.airline_management_system.user.User;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -40,7 +41,15 @@ public class Staff {
     @Temporal(TemporalType.TIMESTAMP)
     private Date shiftEnd;
 
+    // Enum for Staff Roles
     public enum StaffRole {
         PILOT, CREW, MAINTENANCE, GROUND_SUPPORT
+    }
+
+    // This method will set the user based on the userId from the request
+    @JsonProperty("userId")
+    public void setUserById(Integer userId) {
+        this.user = new User();  // Assume a constructor or service can fetch the user by ID
+        this.user.setId(userId);
     }
 }
