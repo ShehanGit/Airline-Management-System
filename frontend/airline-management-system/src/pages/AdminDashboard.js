@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Card, CardContent } from '../components/ui/card';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { Spinner } from '../components/ui/spinner';
+import Sidebar from '../components/Sidebar';
 import { 
   Users, 
   Plane, 
@@ -10,11 +10,8 @@ import {
   Calendar, 
   CreditCard,
   UserCog,
-  Map,
   AlertCircle
 } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
@@ -89,21 +86,32 @@ const AdminDashboard = () => {
     }
   };
 
-  const StatCard = ({ title, value, icon: Icon, loading }) => (
-    <Card className="bg-white">
+  const StatCard = ({ title, value, icon: Icon, loading, color }) => (
+    <Card className="relative overflow-hidden bg-white hover:shadow-lg transition-all duration-300">
+      <div 
+        className="absolute inset-0 opacity-10" 
+        style={{ backgroundColor: color }}
+      />
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm text-gray-500">{title}</p>
+          <div className="flex-1">
+            <p className="text-sm text-gray-600 font-medium">{title}</p>
             {loading ? (
               <div className="mt-2">
-                <Spinner className="h-4 w-4" />
+                <Spinner className="h-4 w-4" style={{ color: color }} />
               </div>
             ) : (
-              <h3 className="text-2xl font-bold mt-1">{value}</h3>
+              <h3 className="text-2xl font-bold mt-1" style={{ color: color }}>
+                {value.toLocaleString()}
+              </h3>
             )}
           </div>
-          <Icon className="h-8 w-8 text-blue-500" />
+          <div 
+            className="p-3 rounded-lg"
+            style={{ backgroundColor: `${color}15` }}
+          >
+            <Icon className="h-8 w-8" style={{ color: color }} />
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -129,50 +137,81 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      
-      <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <StatCard 
-          title="Total Customers" 
-          value={stats.totalCustomers} 
-          icon={Users}
-          loading={loading}
-        />
-        <StatCard 
-          title="Total Staff" 
-          value={stats.totalStaff} 
-          icon={UserCog}
-          loading={loading}
-        />
-        <StatCard 
-          title="Total Aircraft" 
-          value={stats.totalAircrafts} 
-          icon={Plane}
-          loading={loading}
-        />
-        <StatCard 
-          title="Total Bookings" 
-          value={stats.totalBookings} 
-          icon={Calendar}
-          loading={loading}
-        />
-        <StatCard 
-          title="Frequent Flyers" 
-          value={stats.frequentFlyers} 
-          icon={CreditCard}
-          loading={loading}
-        />
-        <StatCard 
-          title="Airports" 
-          value={stats.totalAirports} 
-          icon={Building2}
-          loading={loading}
-        />
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
+            <p className="text-gray-600 mt-1">Welcome to your airline management portal</p>
+          </div>
+          <div className="bg-white p-2 rounded-lg shadow-sm">
+            <p className="text-sm text-gray-600">
+              Last updated: {new Date().toLocaleTimeString()}
+            </p>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <StatCard 
+            title="Total Customers" 
+            value={stats.totalCustomers} 
+            icon={Users}
+            loading={loading}
+            color="#3B82F6" // Blue
+          />
+          <StatCard 
+            title="Total Staff" 
+            value={stats.totalStaff} 
+            icon={UserCog}
+            loading={loading}
+            color="#10B981" // Green
+          />
+          <StatCard 
+            title="Total Aircraft" 
+            value={stats.totalAircrafts} 
+            icon={Plane}
+            loading={loading}
+            color="#6366F1" // Indigo
+          />
+          <StatCard 
+            title="Total Bookings" 
+            value={stats.totalBookings} 
+            icon={Calendar}
+            loading={loading}
+            color="#F59E0B" // Amber
+          />
+          <StatCard 
+            title="Frequent Flyers" 
+            value={stats.frequentFlyers} 
+            icon={CreditCard}
+            loading={loading}
+            color="#EC4899" // Pink
+          />
+          <StatCard 
+            title="Airports" 
+            value={stats.totalAirports} 
+            icon={Building2}
+            loading={loading}
+            color="#8B5CF6" // Purple
+          />
+        </div>
 
-      {/* Rest of the dashboard components remain the same */}
+        {/* Quick Actions Section */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Quick Actions</h2>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {['Add Flight', 'New Booking', 'Register Staff', 'View Reports'].map((action, index) => (
+              <button
+                key={index}
+                className="py-3 px-4 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg
+                          transition-colors duration-200 text-sm font-medium"
+              >
+                {action}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
