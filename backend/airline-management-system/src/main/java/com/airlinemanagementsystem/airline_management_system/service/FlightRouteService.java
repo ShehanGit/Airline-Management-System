@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,5 +42,34 @@ public class FlightRouteService {
         return path.stream()
                 .map(Airport::getId)
                 .collect(Collectors.toList());
+    }
+    public List<FlightRoute> getAllFlightRoutes() {
+        return flightRouteRepository.findAll();
+    }
+
+    public Optional<FlightRoute> getFlightRouteById(Long id) {
+        return flightRouteRepository.findById(id);
+    }
+
+    public FlightRoute createFlightRoute(FlightRoute flightRoute) {
+        return flightRouteRepository.save(flightRoute);
+    }
+
+    public FlightRoute updateFlightRoute(Long id, FlightRoute flightRouteDetails) {
+        Optional<FlightRoute> existingFlightRoute = flightRouteRepository.findById(id);
+        if (existingFlightRoute.isPresent()) {
+            FlightRoute flightRoute = existingFlightRoute.get();
+            // update flightRoute fields with flightRouteDetails
+            return flightRouteRepository.save(flightRoute);
+        }
+        return null;
+    }
+
+    public boolean deleteFlightRoute(Long id) {
+        if (flightRouteRepository.existsById(id)) {
+            flightRouteRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 }
