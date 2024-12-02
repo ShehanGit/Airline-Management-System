@@ -1,29 +1,29 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar.js';
-import Home from './pages/Home.js';
-import Flights from './pages/Flights.js';
-import Bookings from './pages/Bookings.js';
-import Customers from './pages/Customers.js';
-import Aircraft from './pages/Aircraft.js';
-import AdminDashboard from './pages/AdminDashboard.js';
+import Layout from './components/Layout';
+import Home from './pages/Home';
+import Flights from './pages/Flights';
+import Bookings from './pages/Bookings';
+import Customers from './pages/Customers';
+import Aircraft from './pages/Aircraft';
+import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-gray-100">
-        <Navbar />
-        <main className="container mx-auto px-4 py-8">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/flights" element={<Flights />} />
-            <Route path="/bookings" element={<Bookings />} />
-            <Route path="/customers" element={<Customers />} />
-            <Route path="/aircraft" element={<Aircraft />} />
-            <Route path="/admin-dashboard" element={<AdminDashboard />} />
-          </Routes>
-        </main>
-      </div>
+      <Layout>
+        <Routes>
+          {/* Dashboard */}
+          <Route path="/" element={<Home />} />
+          <Route path="/dashboard" element={<AdminDashboard />} />
+          
+          {/* Main Routes */}
+          <Route path="/flights" element={<Flights />} />
+          <Route path="/bookings" element={<Bookings />} />
+          <Route path="/customers" element={<Customers />} />
+          <Route path="/aircraft" element={<Aircraft />} />
+        </Routes>
+      </Layout>
     </Router>
   );
 }
