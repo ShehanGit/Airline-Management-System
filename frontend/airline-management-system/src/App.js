@@ -7,7 +7,7 @@ import Bookings from './pages/Bookings';
 import Customers from './pages/Customers';
 import Aircraft from './pages/Aircraft';
 import AdminDashboard from './pages/AdminDashboard';
-import StaffPage from './pages/Staff.js';
+import StaffManagement from './pages/Staff';  // Add this import
 
 function App() {
   return (
@@ -23,7 +23,7 @@ function App() {
           <Route path="/bookings" element={<Bookings />} />
           <Route path="/customers" element={<Customers />} />
           <Route path="/aircraft" element={<Aircraft />} />
-          <Route path="/staff " element={<StaffPage  />} />
+          <Route path="/staff" element={<StaffManagement />} />  {/* Add this route */}
         </Routes>
       </Layout>
     </Router>
