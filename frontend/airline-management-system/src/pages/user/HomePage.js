@@ -48,7 +48,7 @@ const HomePage = () => {
                         type="text"
                         value={from}
                         onChange={(e) => setFrom(e.target.value)}
-                        className="pl-10 w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="pl-10 w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-400 placeholder-gray-400"
                         placeholder="Departure City"
                         required
                       />
@@ -64,7 +64,7 @@ const HomePage = () => {
                         type="text"
                         value={to}
                         onChange={(e) => setTo(e.target.value)}
-                        className="pl-10 w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="pl-10 w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-400 placeholder-gray-400"
                         placeholder="Arrival City"
                         required
                       />
@@ -80,7 +80,7 @@ const HomePage = () => {
                         type="date"
                         value={date}
                         onChange={(e) => setDate(e.target.value)}
-                        className="pl-10 w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="pl-10 w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-400"
                         required
                       />
                     </div>
@@ -94,7 +94,7 @@ const HomePage = () => {
                       <select
                         value={flightClass}
                         onChange={(e) => setFlightClass(e.target.value)}
-                        className="pl-10 w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                        className="pl-10 w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-400"
                         required
                       >
                         <option value="ECONOMY">Economy</option>
@@ -113,7 +113,7 @@ const HomePage = () => {
                         type="number"
                         value={passengers}
                         onChange={(e) => setPassengers(e.target.value)}
-                        className="pl-10 w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="pl-10 w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-400"
                         min="1"
                         max="10"
                         required
