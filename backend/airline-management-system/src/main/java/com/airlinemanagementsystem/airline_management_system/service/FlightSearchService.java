@@ -27,34 +27,34 @@ public class FlightSearchService {
             Integer passengers,
             String flightClass
     ) {
-        logger.info("Searching for flights with parameters - From: {}, To: {}", from, to);
-
         List<FlightRoute> allFlights = flightRouteRepository.findAll();
-        logger.info("Total flights in database: {}", allFlights.size());
 
-        List<FlightRoute> matchedFlights = allFlights.stream()
+        return allFlights.stream()
                 .filter(flight -> {
-                    // Log debug information about each flight
-                    logger.debug("Checking flight - Source: {}, Destination: {}",
-                            flight.getSource().getName(),
-                            flight.getDestination().getName());
+                    String sourceName = flight.getSource().getName().toLowerCase();
+                    String sourceCode = flight.getSource().getAirportCode().toLowerCase();
+                    String destName = flight.getDestination().getName().toLowerCase();
+                    String destCode = flight.getDestination().getAirportCode().toLowerCase();
 
-                    boolean fromMatch = flight.getSource().getName().equalsIgnoreCase(from) ||
-                            flight.getSource().getAirportCode().equalsIgnoreCase(from);
-                    boolean toMatch = flight.getDestination().getName().equalsIgnoreCase(to) ||
-                            flight.getDestination().getAirportCode().equalsIgnoreCase(to);
+                    String fromSearch = from.toLowerCase();
+                    String toSearch = to.toLowerCase();
 
-                    if (fromMatch && toMatch) {
-                        logger.info("Found matching flight: Source = {}, Destination = {}",
-                                flight.getSource().getName(),
-                                flight.getDestination().getName());
+                    // Check for code match first
+                    boolean fromMatch = sourceCode.equals(fromSearch);
+                    boolean toMatch = destCode.equals(toSearch);
+
+                    // If code doesn't match, try partial name match
+                    if (!fromMatch) {
+                        fromMatch = sourceName.contains(fromSearch) ||
+                                fromSearch.contains(sourceName);
+                    }
+                    if (!toMatch) {
+                        toMatch = destName.contains(toSearch) ||
+                                toSearch.contains(destName);
                     }
 
                     return fromMatch && toMatch;
                 })
                 .collect(Collectors.toList());
-
-        logger.info("Found {} matching flights", matchedFlights.size());
-        return matchedFlights;
     }
 }
