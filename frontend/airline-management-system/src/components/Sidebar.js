@@ -24,54 +24,68 @@ const Sidebar = () => {
     {
       title: 'Dashboard',
       icon: HomeIcon,
-      path: '/dashboard'
+      path: '/admin/AdminDashboard'
     },
     {
       title: 'Flight Management',
       icon: Plane,
-      path: '/flights'
+      path: '/admin/flights'
     },
     {
       title: 'Bookings',
       icon: Calendar,
-      path: '/bookings'
+      path: '/admin/bookings'
     },
     {
       title: 'Customers',
       icon: Users,
-      path: '/customers'
+      path: '/admin/customers'
     },
     {
       title: 'Aircraft',
       icon: Plane,
-      path: '/aircraft'
+      path: '/admin/aircraft'
     },
     {
       title: 'Staff',
       icon: UserCog,
-      path: '/staff'
+      path: '/admin/staff'
     },
     {
       title: 'Reports',
       icon: BarChart3,
-      path: '/reports'
+      path: '/admin/reports'
     },
     {
       title: 'Settings',
       icon: Settings,
-      path: '/settings'
+      path: '/admin/settings'
     }
   ];
+
+  // New function to handle navigation to home page
+  const handleHomeNavigation = () => {
+    navigate('/');
+  };
 
   return (
     <div className={`h-screen bg-white shadow-lg relative transition-all duration-300 ease-in-out ${isCollapsed ? 'w-16' : 'w-64'}`}>
       {/* Header */}
       <div className="flex items-center justify-between h-16 px-3 border-b">
         {!isCollapsed && (
-          <div className="flex items-center">
-            <Plane className="w-6 h-6 text-blue-500" />
+          <div 
+            className="flex items-center cursor-pointer hover:text-blue-600 transition-colors"
+            onClick={handleHomeNavigation}
+          >
+            <Plane className="w-6 h-6 text-blue-500 hover:text-blue-600" />
             <span className="ml-2 font-semibold text-lg">AirlineMS</span>
           </div>
+        )}
+        {isCollapsed && (
+          <Plane 
+            className="w-6 h-6 text-blue-500 hover:text-blue-600 cursor-pointer ml-1"
+            onClick={handleHomeNavigation}
+          />
         )}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}

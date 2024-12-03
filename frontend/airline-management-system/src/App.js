@@ -1,31 +1,45 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
-import Home from './pages/Home';
-import Flights from './pages/Flights';
-import Bookings from './pages/Bookings';
+import UserLayout from './components/UserLayout';
+
+// Admin Pages
+import AdminDashboard from './pages/AdminDashboard';
+import AdminFlights from './pages/Flights';
+import AdminBookings from './pages/Bookings';
 import Customers from './pages/Customers';
 import Aircraft from './pages/Aircraft';
-import AdminDashboard from './pages/AdminDashboard';
-import StaffManagement from './pages/Staff';  // Add this import
+import StaffManagement from './pages/Staff';
+
+// User Pages
+import HomePage from './pages/user/HomePage';
+// import UserFlights from './pages/user/Flights';
+// import UserBookings from './pages/user/Bookings';
+// import UserProfile from './pages/user/Profile';
 
 function App() {
   return (
     <Router>
-      <Layout>
-        <Routes>
-          {/* Dashboard */}
-          <Route path="/" element={<Home />} />
-          <Route path="/dashboard" element={<AdminDashboard />} />
+      <Routes>
+        {/* Admin Routes - with sidebar */}
+        <Route path="/admin" element={<Layout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="flights" element={<AdminFlights />} />
+          <Route path="bookings" element={<AdminBookings />} />
+          <Route path="customers" element={<Customers />} />
+          <Route path="aircraft" element={<Aircraft />} />
+          <Route path="staff" element={<StaffManagement />} />
           
-          {/* Main Routes */}
-          <Route path="/flights" element={<Flights />} />
-          <Route path="/bookings" element={<Bookings />} />
-          <Route path="/customers" element={<Customers />} />
-          <Route path="/aircraft" element={<Aircraft />} />
-          <Route path="/staff" element={<StaffManagement />} />  {/* Add this route */}
-        </Routes>
-      </Layout>
+        </Route>
+
+        {/* User Routes - with navbar */}
+        <Route path="/" element={<UserLayout />}>
+          <Route index element={<HomePage />} />
+          {/* <Route path="flights" element={<UserFlights />} />
+          <Route path="bookings" element={<UserBookings />} />
+          <Route path="profile" element={<UserProfile />} /> */}
+        </Route>
+      </Routes>
     </Router>
   );
 }
