@@ -1,14 +1,46 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Plane, Calendar, MapPin, Users } from 'lucide-react';
+import { Plane, MapPin, Users, ArrowRight } from 'lucide-react';
+import { useBooking } from '../../context/BookingContext';
+
+
+const BookingProgress = ({ currentStep }) => {
+  const steps = ['Search', 'Select Flight', 'Passengers', 'Payment'];
+  
+  return (
+    <div className="w-full py-4 mb-8">
+      <div className="flex justify-between items-center relative">
+        {/* Progress Line */}
+        <div className="absolute left-0 top-1/2 h-1 bg-gray-200 w-full -z-10"></div>
+        <div 
+          className="absolute left-0 top-1/2 h-1 bg-blue-600 transition-all duration-500 -z-10"
+          style={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
+        ></div>
+        
+        {/* Steps */}
+        {steps.map((step, index) => (
+          <div key={step} className="flex flex-col items-center">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 
+              ${index <= currentStep ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
+              {index + 1}
+            </div>
+            <span className="text-sm font-medium">{step}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 const FlightSelectionPage = () => {
   const [flights, setFlights] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedFlight, setSelectedFlight] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search);
+  const { updateBookingDetails } = useBooking();
 
   useEffect(() => {
     const fetchFlights = async () => {
@@ -18,33 +50,52 @@ const FlightSelectionPage = () => {
         const passengers = searchParams.get('passengers');
         const flightClass = searchParams.get('class');
 
-        if (!from || !to || !passengers || !flightClass) {
-          throw new Error('Missing required search parameters');
-        }
+        // Mock data for demonstration
+        const mockFlights = [
+          {
+            id: 1,
+            flightNumber: "SK123",
+            source: { name: from },
+            destination: { name: to },
+            departureTime: new Date().toISOString(),
+            arrivalTime: new Date(Date.now() + 3600000).toISOString(),
+            cost: 599,
+            seatsAvailable: 50
+          },
+          {
+            id: 2,
+            flightNumber: "SK456",
+            source: { name: from },
+            destination: { name: to },
+            departureTime: new Date(Date.now() + 7200000).toISOString(),
+            arrivalTime: new Date(Date.now() + 10800000).toISOString(),
+            cost: 499,
+            seatsAvailable: 35
+          }
+        ];
 
-        const response = await fetch(
-          `http://localhost:8080/api/routes/search?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&passengers=${passengers}&flightClass=${flightClass}`
-        );
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch flights');
-        }
-
-        const data = await response.json();
-        setFlights(data.flights || []);
+        setFlights(mockFlights);
+        setLoading(false);
       } catch (err) {
         setError(err.message);
-      } finally {
         setLoading(false);
       }
     };
 
     fetchFlights();
-  }, [location.search]);
+  }, [location.search, searchParams]);
 
   const handleSelectFlight = (flight) => {
-    // Handle flight selection - you can navigate to booking page or show a modal
-    console.log('Selected flight:', flight);
+    setSelectedFlight(flight);
+    updateBookingDetails({
+      flight,
+      from: searchParams.get('from'),
+      to: searchParams.get('to'),
+      totalPassengers: parseInt(searchParams.get('passengers')),
+      class: searchParams.get('class'),
+      date: searchParams.get('date')
+    });
+    navigate('/booking/passengers');
   };
 
   if (loading) {
@@ -58,103 +109,108 @@ const FlightSelectionPage = () => {
     );
   }
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-50 p-8">
-        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow p-6">
-          <h2 className="text-red-600 text-xl font-bold mb-4">Error</h2>
-          <p className="text-gray-600">{error}</p>
-          <button
-            onClick={() => navigate('/')}
-            className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
-          >
-            Return to Search
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-4xl mx-auto">
-        {/* Search Summary */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <h2 className="text-2xl font-bold mb-4">Flight Search Results</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-            <div>
-              <p className="text-gray-500 flex items-center"><MapPin className="h-4 w-4 mr-1" /> From</p>
-              <p className="font-medium">{searchParams.get('from')}</p>
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-8">
+      <div className="max-w-5xl mx-auto">
+        {/* Progress Bar */}
+        <BookingProgress currentStep={1} />
+        
+        {/* Search Summary Card */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+          <h2 className="text-2xl font-bold mb-6 text-gray-800">Your Flight Search</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="bg-blue-50 p-4 rounded-xl">
+              <div className="flex items-center text-blue-600 mb-2">
+                <MapPin className="h-5 w-5 mr-2" />
+                <span className="font-medium">From</span>
+              </div>
+              <p className="text-gray-800 font-bold">{searchParams.get('from')}</p>
             </div>
-            <div>
-              <p className="text-gray-500 flex items-center"><MapPin className="h-4 w-4 mr-1" /> To</p>
-              <p className="font-medium">{searchParams.get('to')}</p>
+            
+            <div className="bg-blue-50 p-4 rounded-xl">
+              <div className="flex items-center text-blue-600 mb-2">
+                <MapPin className="h-5 w-5 mr-2" />
+                <span className="font-medium">To</span>
+              </div>
+              <p className="text-gray-800 font-bold">{searchParams.get('to')}</p>
             </div>
-            <div>
-              <p className="text-gray-500 flex items-center"><Users className="h-4 w-4 mr-1" /> Passengers</p>
-              <p className="font-medium">{searchParams.get('passengers')}</p>
+
+            <div className="bg-blue-50 p-4 rounded-xl">
+              <div className="flex items-center text-blue-600 mb-2">
+                <Users className="h-5 w-5 mr-2" />
+                <span className="font-medium">Passengers</span>
+              </div>
+              <p className="text-gray-800 font-bold">{searchParams.get('passengers')}</p>
             </div>
-            <div>
-              <p className="text-gray-500 flex items-center"><Plane className="h-4 w-4 mr-1" /> Class</p>
-              <p className="font-medium">{searchParams.get('class')}</p>
+
+            <div className="bg-blue-50 p-4 rounded-xl">
+              <div className="flex items-center text-blue-600 mb-2">
+                <Plane className="h-5 w-5 mr-2" />
+                <span className="font-medium">Class</span>
+              </div>
+              <p className="text-gray-800 font-bold">{searchParams.get('class')}</p>
             </div>
           </div>
         </div>
 
-        {/* Flight List */}
-        {flights.length > 0 ? (
-          <div className="space-y-4">
-            {flights.map((flight) => (
-              <div
-                key={flight.id}
-                className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow"
-              >
-                <div className="flex justify-between items-center flex-wrap">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-4 mb-3">
+        {/* Flights List */}
+        <div className="space-y-6">
+          {flights.map((flight) => (
+            <div
+              key={flight.id}
+              className={`bg-white rounded-2xl shadow-lg p-6 transition-all duration-300 
+                ${selectedFlight?.id === flight.id ? 'ring-2 ring-blue-600 transform scale-102' : 'hover:shadow-xl'}`}
+            >
+              <div className="flex flex-wrap md:flex-nowrap justify-between items-center gap-6">
+                <div className="flex-1">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="bg-blue-100 p-2 rounded-lg">
                       <Plane className="h-6 w-6 text-blue-600" />
-                      <span className="text-lg font-bold">{flight.flightNumber}</span>
                     </div>
-                    <div className="grid grid-cols-2 gap-8">
-                      <div>
-                        <p className="text-sm text-gray-500">Departure</p>
-                        <p className="font-medium">{flight.source.name}</p>
-                        <p className="text-sm text-gray-600">
-                          {new Date(flight.departureTime).toLocaleString()}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500">Arrival</p>
-                        <p className="font-medium">{flight.destination.name}</p>
-                        <p className="text-sm text-gray-600">
-                          {new Date(flight.arrivalTime).toLocaleString()}
-                        </p>
-                      </div>
-                    </div>
+                    <span className="text-lg font-bold text-gray-800">Flight {flight.flightNumber}</span>
                   </div>
-                  <div className="text-right mt-4 md:mt-0">
-                    <p className="text-3xl font-bold text-blue-600">${flight.cost}</p>
-                    <p className="text-gray-500 mb-2">{searchParams.get('class')} Class</p>
-                    <button
-                      onClick={() => handleSelectFlight(flight)}
-                      className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      Select Flight
-                    </button>
+                  
+                  <div className="grid grid-cols-2 gap-8">
+                    <div>
+                      <p className="text-sm text-gray-500 mb-1">Departure</p>
+                      <p className="font-bold text-gray-800">{flight.source.name}</p>
+                      <p className="text-sm text-gray-600">
+                        {new Date(flight.departureTime).toLocaleTimeString()}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500 mb-1">Arrival</p>
+                      <p className="font-bold text-gray-800">{flight.destination.name}</p>
+                      <p className="text-sm text-gray-600">
+                        {new Date(flight.arrivalTime).toLocaleTimeString()}
+                      </p>
+                    </div>
                   </div>
                 </div>
+
+                <div className="flex flex-col items-end gap-4">
+                  <div className="text-right">
+                    <p className="text-3xl font-bold text-blue-600">${flight.cost}</p>
+                    <p className="text-gray-500">{searchParams.get('class')} Class</p>
+                  </div>
+                  
+                  <button
+                    onClick={() => handleSelectFlight(flight)}
+                    className="bg-blue-600 text-white px-8 py-3 rounded-xl hover:bg-blue-700 
+                      transition-colors flex items-center gap-2 font-medium"
+                  >
+                    Select Flight
+                    <ArrowRight className="h-5 w-5" />
+                  </button>
+                </div>
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="bg-white rounded-lg shadow-lg p-6 text-center">
-            <p className="text-gray-600 mb-4">No flights found for this route.</p>
-            <button
-              onClick={() => navigate('/')}
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
-            >
-              Modify Search
-            </button>
+            </div>
+          ))}
+        </div>
+
+        {error && (
+          <div className="bg-red-50 text-red-600 p-4 rounded-lg mt-6">
+            {error}
           </div>
         )}
       </div>
