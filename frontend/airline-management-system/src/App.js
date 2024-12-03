@@ -13,6 +13,7 @@ import StaffManagement from './pages/Staff';
 
 // User Pages
 import HomePage from './pages/user/HomePage';
+import FlightSelectionPage from './pages/user/FlightSelectionPage';
 // import UserFlights from './pages/user/Flights';
 // import UserBookings from './pages/user/Bookings';
 // import UserProfile from './pages/user/Profile';
@@ -35,6 +36,8 @@ function App() {
         {/* User Routes - with navbar */}
         <Route path="/" element={<UserLayout />}>
           <Route index element={<HomePage />} />
+          <Route path="flights/select" element={<FlightSelectionPage />} />
+
           {/* <Route path="flights" element={<UserFlights />} />
           <Route path="bookings" element={<UserBookings />} />
           <Route path="profile" element={<UserProfile />} /> */}

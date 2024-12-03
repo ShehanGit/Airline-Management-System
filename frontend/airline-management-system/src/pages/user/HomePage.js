@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, Plane, Calendar, MapPin, Users } from 'lucide-react';
 import homeImage from '../../images/homeImage1.jpg';
 
 const HomePage = () => {
+  const navigate = useNavigate();
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const [date, setDate] = useState('');
   const [passengers, setPassengers] = useState(1);
+  const [flightClass, setFlightClass] = useState('ECONOMY');
 
   const handleSearch = (e) => {
     e.preventDefault();
-    console.log('Searching flights:', { from, to, date, passengers });
+    navigate(`/flights/select?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&passengers=${passengers}&class=${flightClass}`);
   };
 
   return (
@@ -24,20 +27,19 @@ const HomePage = () => {
         }}
       >
         <div className="absolute inset-0 bg-black bg-opacity-40">
-          {/* Changed justify-center to justify-start and added pt-48 */}
           <div className="container mx-auto px-4 h-full flex flex-col justify-start pt-36 items-center text-white">
             <h1 className="text-5xl font-bold mb-6 text-center">
               Welcome to SkyWings Airlines
             </h1>
-            {/* Increased mb-12 to mb-24 for more space */}
             <p className="text-xl mb-24 text-center">
               Discover the world with comfort and style
             </p>
 
-            {/* Flight Search Form - added mt-20 for additional spacing */}
-            <div className="w-full max-w-4xl bg-white/95 p-8 rounded-lg shadow-2xl mt-18">
+            {/* Flight Search Form */}
+            <div className="w-full max-w-5xl bg-white/95 p-8 rounded-lg shadow-2xl mt-18">
               <form onSubmit={handleSearch} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+                  {/* From Field */}
                   <div>
                     <label className="block text-gray-700 text-sm font-medium mb-2">From</label>
                     <div className="relative">
@@ -48,10 +50,12 @@ const HomePage = () => {
                         onChange={(e) => setFrom(e.target.value)}
                         className="pl-10 w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Departure City"
+                        required
                       />
                     </div>
                   </div>
                   
+                  {/* To Field */}
                   <div>
                     <label className="block text-gray-700 text-sm font-medium mb-2">To</label>
                     <div className="relative">
@@ -62,10 +66,12 @@ const HomePage = () => {
                         onChange={(e) => setTo(e.target.value)}
                         className="pl-10 w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Arrival City"
+                        required
                       />
                     </div>
                   </div>
 
+                  {/* Date Field */}
                   <div>
                     <label className="block text-gray-700 text-sm font-medium mb-2">Date</label>
                     <div className="relative">
@@ -75,10 +81,30 @@ const HomePage = () => {
                         value={date}
                         onChange={(e) => setDate(e.target.value)}
                         className="pl-10 w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        required
                       />
                     </div>
                   </div>
 
+                  {/* Class Selection */}
+                  <div>
+                    <label className="block text-gray-700 text-sm font-medium mb-2">Class</label>
+                    <div className="relative">
+                      <Plane className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                      <select
+                        value={flightClass}
+                        onChange={(e) => setFlightClass(e.target.value)}
+                        className="pl-10 w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                        required
+                      >
+                        <option value="ECONOMY">Economy</option>
+                        <option value="BUSINESS">Business</option>
+                        <option value="FIRST">First Class</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Passengers Field */}
                   <div>
                     <label className="block text-gray-700 text-sm font-medium mb-2">Passengers</label>
                     <div className="relative">
@@ -90,11 +116,13 @@ const HomePage = () => {
                         className="pl-10 w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         min="1"
                         max="10"
+                        required
                       />
                     </div>
                   </div>
                 </div>
 
+                {/* Search Button */}
                 <button
                   type="submit"
                   className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center gap-2 text-lg font-medium"
