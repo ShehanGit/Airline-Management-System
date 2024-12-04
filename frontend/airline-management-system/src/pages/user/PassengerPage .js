@@ -60,6 +60,21 @@ const PassengerPage = () => {
 
   const resetError = () => setError('');
 
+  const saveUserData = (userData) => {
+    try {
+      const userInfo = {
+        userId: userData.id,
+        email: userData.email,
+        firstname: userData.firstname,
+        lastname: userData.lastname
+      };
+      localStorage.setItem('userData', JSON.stringify(userInfo));
+      console.log('User data saved:', userInfo);
+    } catch (err) {
+      console.error('Error saving user data:', err);
+    }
+  };
+
   const handleUserLookup = async () => {
     resetError();
     setLoading(true);
@@ -76,6 +91,8 @@ const PassengerPage = () => {
       }
       
       const userData = await response.json();
+      saveUserData(userData);
+      
       setFormData(prev => ({
         ...prev,
         ...userData,
@@ -87,7 +104,11 @@ const PassengerPage = () => {
       const customerResponse = await fetch(`http://localhost:8080/customers/user/${userData.id}`);
       if (customerResponse.ok) {
         const customerData = await customerResponse.json();
-        handleBookingProcess(userData.id);
+        localStorage.setItem('customerData', JSON.stringify({
+          customerId: customerData.customerId,
+          passportNumber: customerData.passportNumber
+        }));
+        handleBookingProcess(userData.id, customerData.customerId);
       } else {
         setActiveForm('customer');
       }
@@ -121,6 +142,8 @@ const PassengerPage = () => {
       }
       
       const userData = await response.json();
+      saveUserData(userData);
+      
       setFormData(prev => ({
         ...prev,
         id: userData.id
@@ -161,7 +184,12 @@ const PassengerPage = () => {
       }
       
       const customerData = await response.json();
-      handleBookingProcess(formData.id);
+      localStorage.setItem('customerData', JSON.stringify({
+        customerId: customerData.customerId,
+        passportNumber: customerData.passportNumber
+      }));
+      
+      handleBookingProcess(formData.id, customerData.customerId);
     } catch (error) {
       setError(error.message || 'Failed to create customer profile');
     } finally {
@@ -169,15 +197,26 @@ const PassengerPage = () => {
     }
   };
 
-  const handleBookingProcess = (userId) => {
-    localStorage.setItem('bookingDetails', JSON.stringify({
+  const handleBookingProcess = (userId, customerId) => {
+    const bookingInfo = {
       userId,
+      customerId,
       flightId,
       passengerCount: searchData?.passengers,
       class: searchData?.class
-    }));
-    navigate(`/booking/payment`);
+    };
+    localStorage.setItem('bookingDetails', JSON.stringify(bookingInfo));
+    
+    // Log all stored data for verification
+    console.group('Stored Booking Data');
+    console.log('Booking Details:', bookingInfo);
+    console.log('User Data:', localStorage.getItem('userData'));
+    console.log('Customer Data:', localStorage.getItem('customerData'));
+    console.groupEnd();
+    
+    navigate('/booking/payment');
   };
+
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
