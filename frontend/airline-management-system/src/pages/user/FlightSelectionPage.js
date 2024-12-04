@@ -67,11 +67,15 @@ const FlightSelectionPage = () => {
     // Store in localStorage
     localStorage.setItem('flightSearchData', JSON.stringify(searchData));
     localStorage.setItem('bookingDetails', JSON.stringify(bookingDetails));
+    localStorage.setItem('flightId', flight.id); // Store flight ID separately
+
     
     // Log the stored data immediately after setting
     console.group('Stored Flight Data');
     console.log('Search Data:', searchData);
     console.log('Booking Details:', bookingDetails);
+    console.log('Flight ID:', flight.id);
+
     console.groupEnd();
     
     // Navigate to the passengers page

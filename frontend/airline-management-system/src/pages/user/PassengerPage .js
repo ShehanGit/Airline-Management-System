@@ -75,49 +75,7 @@ const PassengerPage = () => {
     }
   };
 
-  const handleUserLookup = async () => {
-    resetError();
-    setLoading(true);
-    try {
-      const response = await fetch(`http://localhost:8080/api/users/email/${formData.email}`);
-      if (!response.ok) {
-        if (response.status === 404) {
-          setError('User not found. Please register.');
-          setActiveForm('register');
-        } else {
-          throw new Error('Error looking up user');
-        }
-        return;
-      }
-      
-      const userData = await response.json();
-      saveUserData(userData);
-      
-      setFormData(prev => ({
-        ...prev,
-        ...userData,
-        id: userData.id,
-        password: ''
-      }));
-      
-      // Check if customer profile exists
-      const customerResponse = await fetch(`http://localhost:8080/customers/user/${userData.id}`);
-      if (customerResponse.ok) {
-        const customerData = await customerResponse.json();
-        localStorage.setItem('customerData', JSON.stringify({
-          customerId: customerData.customerId,
-          passportNumber: customerData.passportNumber
-        }));
-        handleBookingProcess(userData.id, customerData.customerId);
-      } else {
-        setActiveForm('customer');
-      }
-    } catch (error) {
-      setError(error.message || 'An error occurred during user lookup');
-    } finally {
-      setLoading(false);
-    }
-  };
+
 
   const handleRegisterUser = async (e) => {
     e.preventDefault();
@@ -177,17 +135,15 @@ const PassengerPage = () => {
           frequentFlyer: false
         }),
       });
-
+  
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Customer profile creation failed');
       }
       
       const customerData = await response.json();
-      localStorage.setItem('customerData', JSON.stringify({
-        customerId: customerData.customerId,
-        passportNumber: customerData.passportNumber
-      }));
+      // Simply store the customer ID
+      localStorage.setItem('customerId', customerData.customerId);
       
       handleBookingProcess(formData.id, customerData.customerId);
     } catch (error) {
@@ -196,7 +152,49 @@ const PassengerPage = () => {
       setLoading(false);
     }
   };
-
+  
+  const handleUserLookup = async () => {
+    resetError();
+    setLoading(true);
+    try {
+      const response = await fetch(`http://localhost:8080/api/users/email/${formData.email}`);
+      if (!response.ok) {
+        if (response.status === 404) {
+          setError('User not found. Please register.');
+          setActiveForm('register');
+        } else {
+          throw new Error('Error looking up user');
+        }
+        return;
+      }
+      
+      const userData = await response.json();
+      localStorage.setItem('userId', userData.id);
+      
+      setFormData(prev => ({
+        ...prev,
+        ...userData,
+        id: userData.id,
+        password: ''
+      }));
+      
+      // Check if customer profile exists
+      const customerResponse = await fetch(`http://localhost:8080/customers/user/${userData.id}`);
+      if (customerResponse.ok) {
+        const customerData = await customerResponse.json();
+        // Simply store the customer ID
+        localStorage.setItem('customerId', customerData.customerId);
+        handleBookingProcess(userData.id, customerData.customerId);
+      } else {
+        setActiveForm('customer');
+      }
+    } catch (error) {
+      setError(error.message || 'An error occurred during user lookup');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   const handleBookingProcess = (userId, customerId) => {
     const bookingInfo = {
       userId,
@@ -206,14 +204,6 @@ const PassengerPage = () => {
       class: searchData?.class
     };
     localStorage.setItem('bookingDetails', JSON.stringify(bookingInfo));
-    
-    // Log all stored data for verification
-    console.group('Stored Booking Data');
-    console.log('Booking Details:', bookingInfo);
-    console.log('User Data:', localStorage.getItem('userData'));
-    console.log('Customer Data:', localStorage.getItem('customerData'));
-    console.groupEnd();
-    
     navigate('/booking/payment');
   };
 

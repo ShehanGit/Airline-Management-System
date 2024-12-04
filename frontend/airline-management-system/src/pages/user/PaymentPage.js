@@ -92,12 +92,13 @@ const PaymentPage = () => {
     }
   }, [navigate]);
 
-  const fetchFlightDetails = async (flightId) => {
+  const fetchFlightDetails = async () => {
     try {
+      const flightId = localStorage.getItem('flightId');
       if (!flightId) {
         throw new Error('No flight ID provided');
       }
-  
+      
       const response = await fetch(`http://localhost:8080/api/routes/${flightId}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch flight details (Status: ${response.status})`);
@@ -154,26 +155,36 @@ const PaymentPage = () => {
     setLoading(true);
     setError('');
     setSuccess('');
-
+  
+    // Get customer ID from localStorage
+    const customerId = localStorage.getItem('customerId');
+    
+    if (!customerId) {
+      setError('Customer information not found');
+      setLoading(false);
+      return;
+    }
+  
     try {
-      // Create payment record
+      // Create payment record with customer ID
       const paymentResponse = await fetch('http://localhost:8080/api/payments', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          customerId: customerId,
           bookingId: bookingDetails.bookingId,
           amountPaid: flightDetails.cost * bookingDetails.passengerCount,
           paymentMethod,
           paymentStatus: 'COMPLETED'
         }),
       });
-
+  
       if (!paymentResponse.ok) {
         throw new Error('Payment failed');
       }
-
+  
       setSuccess('Payment processed successfully!');
       
       // Redirect to confirmation page after a short delay
