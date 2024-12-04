@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Plane, Calendar, MapPin, Users } from 'lucide-react';
-import LocalStorageMonitor from './LocalStorageMonitor';
 
 const FlightSelectionPage = () => {
   const [flights, setFlights] = useState([]);
@@ -112,8 +111,6 @@ const FlightSelectionPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
-      {/* Include the LocalStorageMonitor component */}
-      <LocalStorageMonitor />
       
       <div className="max-w-4xl mx-auto">
         {/* Search Summary */}
