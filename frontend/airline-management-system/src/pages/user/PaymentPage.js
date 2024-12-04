@@ -70,23 +70,49 @@ const PaymentPage = () => {
   useEffect(() => {
     // Load booking details from localStorage
     const storedDetails = localStorage.getItem('bookingDetails');
-    if (storedDetails) {
-      const details = JSON.parse(storedDetails);
-      setBookingDetails(details);
-      
-      // Fetch flight details
-      fetchFlightDetails(details.flightId);
+    if (!storedDetails) {
+      // If no booking details, redirect back to flight selection
+      navigate('/flights/select');
+      return;
     }
-  }, []);
+  
+    try {
+      const details = JSON.parse(storedDetails);
+      if (!details.flightId) {
+        // If flightId is missing, redirect back to flight selection
+        navigate('/flights/select');
+        return;
+      }
+      
+      setBookingDetails(details);
+      fetchFlightDetails(details.flightId);
+    } catch (error) {
+      setError('Invalid booking details');
+      navigate('/flights/select');
+    }
+  }, [navigate]);
 
   const fetchFlightDetails = async (flightId) => {
     try {
+      if (!flightId) {
+        throw new Error('No flight ID provided');
+      }
+  
       const response = await fetch(`http://localhost:8080/api/routes/${flightId}`);
-      if (!response.ok) throw new Error('Failed to fetch flight details');
+      if (!response.ok) {
+        throw new Error(`Failed to fetch flight details (Status: ${response.status})`);
+      }
+      
       const data = await response.json();
+      if (!data) {
+        throw new Error('No flight data received');
+      }
+      
       setFlightDetails(data);
     } catch (error) {
-      setError('Failed to load flight details');
+      setError(`Failed to load flight details: ${error.message}`);
+      // Optionally redirect back to flight selection
+      navigate('/flights/select');
     }
   };
 
@@ -171,7 +197,6 @@ const PaymentPage = () => {
       </div>
     );
   }
-  
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">

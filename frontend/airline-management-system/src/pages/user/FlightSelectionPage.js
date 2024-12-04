@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Plane, Calendar, MapPin, Users } from 'lucide-react';
+import LocalStorageMonitor from './LocalStorageMonitor';
 
 const FlightSelectionPage = () => {
   const [flights, setFlights] = useState([]);
@@ -43,19 +44,40 @@ const FlightSelectionPage = () => {
   }, [location.search]);
 
   const handleSelectFlight = (flight) => {
-    // Save current search parameters and flight data to localStorage
+    // Save both search data and flight details
     const searchData = {
       from: searchParams.get('from'),
       to: searchParams.get('to'),
       passengers: searchParams.get('passengers'),
       class: searchParams.get('class')
     };
-    localStorage.setItem('flightSearchData', JSON.stringify(searchData));
     
-    // Navigate to passenger page with flight ID
-    // navigate(`/passenger/${flight.id}`);
-    navigate(`/passenger`);
+    const bookingDetails = {
+      flightId: flight.id,
+      flightNumber: flight.flightNumber,
+      class: searchParams.get('class'),
+      passengerCount: parseInt(searchParams.get('passengers')),
+      cost: flight.cost,
+      departureTime: flight.departureTime,
+      arrivalTime: flight.arrivalTime,
+      source: flight.source.name,
+      destination: flight.destination.name
+    };
+  
+    // Store in localStorage
+    localStorage.setItem('flightSearchData', JSON.stringify(searchData));
+    localStorage.setItem('bookingDetails', JSON.stringify(bookingDetails));
+    
+    // Log the stored data immediately after setting
+    console.group('Stored Flight Data');
+    console.log('Search Data:', searchData);
+    console.log('Booking Details:', bookingDetails);
+    console.groupEnd();
+    
+    // Navigate to the passengers page
+    navigate('/booking/passengers');
   };
+  
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -86,6 +108,9 @@ const FlightSelectionPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
+      {/* Include the LocalStorageMonitor component */}
+      <LocalStorageMonitor />
+      
       <div className="max-w-4xl mx-auto">
         {/* Search Summary */}
         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
