@@ -39,7 +39,7 @@ function App() {
           <Route index element={<HomePage />} />
           <Route path="flights/select" element={<FlightSelectionPage />} />
           <Route path="passenger" element={<PassengerPage />} />
-          <Route path="paymentmethod" element={<PaymentMethod />} />
+          <Route path="booking/payment" element={<PaymentMethod />} />
 
           {/* <Route path="flights" element={<UserFlights />} />
           <Route path="bookings" element={<UserBookings />} />

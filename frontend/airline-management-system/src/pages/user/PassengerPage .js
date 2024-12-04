@@ -179,6 +179,10 @@ const PassengerPage = () => {
     navigate(`/booking/payment`);
   };
 
+
+
+
+  
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-3xl mx-auto">

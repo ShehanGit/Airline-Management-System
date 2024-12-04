@@ -53,7 +53,8 @@ const FlightSelectionPage = () => {
     localStorage.setItem('flightSearchData', JSON.stringify(searchData));
     
     // Navigate to passenger page with flight ID
-    navigate(`/passenger/${flight.id}`);
+    // navigate(`/passenger/${flight.id}`);
+    navigate(`/passenger`);
   };
   if (loading) {
     return (
