@@ -43,10 +43,18 @@ const FlightSelectionPage = () => {
   }, [location.search]);
 
   const handleSelectFlight = (flight) => {
-    // Handle flight selection - you can navigate to booking page or show a modal
-    console.log('Selected flight:', flight);
+    // Save current search parameters and flight data to localStorage
+    const searchData = {
+      from: searchParams.get('from'),
+      to: searchParams.get('to'),
+      passengers: searchParams.get('passengers'),
+      class: searchParams.get('class')
+    };
+    localStorage.setItem('flightSearchData', JSON.stringify(searchData));
+    
+    // Navigate to passenger page with flight ID
+    navigate(`/passenger/${flight.id}`);
   };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">

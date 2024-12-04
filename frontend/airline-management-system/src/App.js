@@ -14,7 +14,8 @@ import StaffManagement from './pages/Staff';
 // User Pages
 import HomePage from './pages/user/HomePage';
 import FlightSelectionPage from './pages/user/FlightSelectionPage';
-// import UserFlights from './pages/user/Flights';
+import PassengerPage from './pages/user/PassengerPage ';
+import PaymentMethod from './pages/user/PaymentPage';
 // import UserBookings from './pages/user/Bookings';
 // import UserProfile from './pages/user/Profile';
 
@@ -37,6 +38,8 @@ function App() {
         <Route path="/" element={<UserLayout />}>
           <Route index element={<HomePage />} />
           <Route path="flights/select" element={<FlightSelectionPage />} />
+          <Route path="passenger" element={<PassengerPage />} />
+          <Route path="paymentmethod" element={<PaymentMethod />} />
 
           {/* <Route path="flights" element={<UserFlights />} />
           <Route path="bookings" element={<UserBookings />} />
