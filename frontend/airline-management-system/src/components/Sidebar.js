@@ -3,20 +3,20 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   HomeIcon,
   Plane, 
-  Building2, 
+  // Building2, 
   Users,
   Calendar,
   Settings,
   LogOut,
   Menu,
-  ChevronDown,
+  // ChevronDown,
   UserCog,
   BarChart3
 } from 'lucide-react';
 
 const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [openMenus, setOpenMenus] = useState({});
+  // const [openMenus, setOpenMenus] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
 

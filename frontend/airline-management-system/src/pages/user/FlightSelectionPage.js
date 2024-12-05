@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Plane, Calendar, MapPin, Users } from 'lucide-react';
+import { Plane, MapPin, Users } from 'lucide-react';
 
 const FlightSelectionPage = () => {
   const [flights, setFlights] = useState([]);
@@ -41,6 +41,7 @@ const FlightSelectionPage = () => {
 
     fetchFlights();
   }, [location.search]);
+  
 
   const handleSelectFlight = (flight) => {
     // Save both search data and flight details
@@ -66,19 +67,13 @@ const FlightSelectionPage = () => {
     // Store in localStorage
     localStorage.setItem('flightSearchData', JSON.stringify(searchData));
     localStorage.setItem('bookingDetails', JSON.stringify(bookingDetails));
-    localStorage.setItem('flightId', flight.id); // Store flight ID separately
+    localStorage.setItem('flightId', flight.id);
 
-    
-    // Log the stored data immediately after setting
-    console.group('Stored Flight Data');
-    console.log('Search Data:', searchData);
-    console.log('Booking Details:', bookingDetails);
-    console.log('Flight ID:', flight.id);
 
     console.groupEnd();
     
     // Navigate to the passengers page
-    navigate('/booking/passengers');
+    navigate('/passengers');
   };
   
   if (loading) {
@@ -180,6 +175,7 @@ const FlightSelectionPage = () => {
                 </div>
               </div>
             ))}
+
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow-lg p-6 text-center">

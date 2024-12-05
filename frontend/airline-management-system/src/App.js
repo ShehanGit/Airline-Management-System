@@ -14,6 +14,7 @@ import StaffManagement from './pages/Staff';
 // User Pages
 import HomePage from './pages/user/HomePage';
 import FlightSelectionPage from './pages/user/FlightSelectionPage';
+import RegisterCustomer from './pages/user/CustomerRegistration';
 
 function App() {
   return (
@@ -28,12 +29,14 @@ function App() {
           <Route path="aircraft" element={<Aircraft />} />
           <Route path="staff" element={<StaffManagement />} />
           
+          
         </Route>
 
         {/* User Routes - with navbar */}
         <Route path="/" element={<UserLayout />}>
           <Route index element={<HomePage />} />
           <Route path="flights/select" element={<FlightSelectionPage />} />
+          <Route path="passengers" element={<RegisterCustomer />} />
           
 
         </Route>
