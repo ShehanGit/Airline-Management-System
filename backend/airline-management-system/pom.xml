@@ -18,7 +18,7 @@
 	<url/>
 
 	<properties>
-		<java.version>17</java.version> <!-- Choose Java version -->
+		<java.version>23</java.version> <!-- Choose Java version -->
 	</properties>
 
 	<dependencies>
